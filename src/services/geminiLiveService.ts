@@ -59,8 +59,8 @@ export const connectLiveSession = async (
             throw new Error('API key not configured. Please set your Gemini API key in settings.');
         }
 
-        // Initialize AI client
-        const ai = new GoogleGenAI({ apiKey });
+        // Initialize AI client with v1alpha for Live API support
+        const ai = new GoogleGenAI({ apiKey, apiVersion: 'v1alpha' });
 
         // Reset state
         currentAccumulatedTranscription = '';
@@ -83,20 +83,23 @@ export const connectLiveSession = async (
         });
 
         // Build system instruction
-        const systemInstruction = config.systemInstruction || `
-            You are a passive meeting transcription system.
-            Your SOLE task is to listen to the audio stream and transcribe what is said accurately.
-            You DO NOT speak. You DO NOT reply to questions verbally. You DO NOT introduce yourself.
-            Stay completely silent and only output the transcription text.
-            Language: ${config.language || 'English'}
-        `;
+        const systemInstruction = config.systemInstruction ||
+            `You are a meeting transcription assistant. Listen and transcribe accurately. Language: ${config.language || 'English'}`;
+
+        console.log('Attempting to connect to Gemini Live API...');
+        console.log('Model: gemini-live-2.5-flash-preview');
 
         // Connect to Gemini Live API
-        // Use the latest native audio model (updated January 2025)
+        // Use the official Live API model name from SDK docs
         const session = await ai.live.connect({
-            model: 'gemini-2.5-flash-native-audio-preview-12-2025',
+            model: 'gemini-live-2.5-flash-preview',
+            config: {
+                responseModalities: [Modality.TEXT],
+                systemInstruction: systemInstruction,
+            },
             callbacks: {
                 onopen: () => {
+                    console.log('Live API connection opened successfully');
                     isConnected = true;
                     callbacks.onOpen();
 
@@ -133,7 +136,20 @@ export const connectLiveSession = async (
                     }, 1000);
                 },
                 onmessage: (message: any) => {
-                    // Handle transcription from inputTranscription
+                    console.log('Live API message:', JSON.stringify(message, null, 2));
+
+                    // Handle text responses (for TEXT modality)
+                    if (message.serverContent?.modelTurn?.parts) {
+                        for (const part of message.serverContent.modelTurn.parts) {
+                            if (part.text) {
+                                currentAccumulatedTranscription += part.text;
+                                lastTranscriptionUpdate = Date.now();
+                                callbacks.onTranscription(currentAccumulatedTranscription, false);
+                            }
+                        }
+                    }
+
+                    // Handle transcription from inputTranscription (if available)
                     if (message.serverContent?.inputTranscription) {
                         const text = message.serverContent.inputTranscription.text;
                         if (text) {
@@ -151,31 +167,27 @@ export const connectLiveSession = async (
                         }
                     }
                 },
-                onclose: () => {
+                onclose: (e: any) => {
+                    console.log('Live API connection closed:', e?.reason || 'unknown reason');
                     isConnected = false;
                     callbacks.onClose();
                     if (silenceTimeout) clearInterval(silenceTimeout);
                 },
                 onerror: (e: any) => {
                     isConnected = false;
-                    callbacks.onError(new Error(e?.message || 'Live session error'));
-                    console.error('Live session error:', e);
-                }
-            },
-            config: {
-                responseModalities: [Modality.AUDIO],
-                inputAudioTranscription: {},
-                systemInstruction: systemInstruction,
-                speechConfig: {
-                    voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } }
+                    const errorMsg = e?.message || e?.reason || (typeof e === 'string' ? e : 'Live session error');
+                    callbacks.onError(new Error(errorMsg));
+                    console.error('Live session error details:', e);
                 }
             }
         });
 
         activeSession = session;
 
-    } catch (error) {
-        callbacks.onError(error as Error);
+    } catch (error: any) {
+        console.error('Live session connection error:', error);
+        const errorMessage = error?.message || error?.reason || 'Failed to connect to Gemini Live API';
+        callbacks.onError(new Error(errorMessage));
     }
 };
 
