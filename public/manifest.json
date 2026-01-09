@@ -1,0 +1,56 @@
+{
+  "manifest_version": 3,
+  "name": "MicroLabs AI Tools",
+  "version": "1.0.0",
+  "description": "169+ AI-powered micro-tools for browsing: summarize, analyze, and automate - all context-aware",
+  "permissions": [
+    "sidePanel",
+    "storage",
+    "tabs",
+    "activeTab",
+    "contextMenus",
+    "scripting",
+    "tabCapture",
+    "debugger"
+  ],
+  "host_permissions": [
+    "https://generativelanguage.googleapis.com/*",
+    "wss://speech.platform.bing.com/*",
+    "<all_urls>"
+  ],
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "icons": {
+    "16": "icon16.png",
+    "32": "icon32.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "action": {
+    "default_title": "MicroLabs AI Tools",
+    "default_icon": {
+      "16": "icon16.png",
+      "32": "icon32.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "assets/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "assets/selection.js"
+      ]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://generativelanguage.googleapis.com wss://speech.platform.bing.com https://speech.platform.bing.com"
+  }
+}

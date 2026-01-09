@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MicroLabs AI</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo" id="logoHome">
+        <img src="icons/icon32.png" alt="MicroLabs" class="logo-img">
+        <span class="logo-text">MicroLabs</span>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="settingsBtn" title="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- API Key Setup -->
+    <div id="apiKeySetup" class="panel setup-panel hidden">
+      <div class="setup-container">
+        <div class="setup-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+          </svg>
+        </div>
+        <h2>Welcome to MicroLabs</h2>
+        <p>Enter your Google AI API key to get started with AI-powered tools.</p>
+        <div class="input-group">
+          <input type="password" id="apiKeyInput" placeholder="Enter your API key">
+          <button class="btn btn-primary" id="saveApiKeyBtn">Save & Continue</button>
+        </div>
+        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="help-link">Get your free API key →</a>
+      </div>
+    </div>
+
+    <!-- Home Panel -->
+    <div id="homePanel" class="panel hidden">
+      <!-- Context Banner -->
+      <div class="context-banner" id="contextBanner">
+        <div class="context-icon" id="contextIcon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 16v-4M12 8h.01"/>
+          </svg>
+        </div>
+        <div class="context-info">
+          <div class="context-label" id="contextLabel">Ready</div>
+          <div class="context-detail" id="contextDetail">Browse to a page to get started</div>
+        </div>
+        <button class="context-refresh" id="refreshContext" title="Refresh">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M23 4v6h-6M1 20v-6h6"/>
+            <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- App Cards Grid -->
+      <div class="apps-grid">
+        <!-- Page Digest -->
+        <div class="app-card-large" data-app="pageDigest">
+          <div class="app-card-icon">📄</div>
+          <div class="app-card-content">
+            <h3>Page Digest</h3>
+            <p>Get a structured summary of any webpage with key sections and takeaways</p>
+          </div>
+          <div class="app-card-arrow">→</div>
+        </div>
+
+        <!-- YouTube Digest (context-aware) -->
+        <div class="app-card-large" data-app="youtubeDigest" id="youtubeCard">
+          <div class="app-card-icon">▶️</div>
+          <div class="app-card-content">
+            <h3>YouTube Digest</h3>
+            <p>Summarize videos with timestamps and key points</p>
+          </div>
+          <div class="app-card-arrow">→</div>
+        </div>
+
+        <!-- Chat with Page -->
+        <div class="app-card-large" data-app="chatWithPage">
+          <div class="app-card-icon">💬</div>
+          <div class="app-card-content">
+            <h3>Chat with Page</h3>
+            <p>Ask questions about the current page and get grounded answers</p>
+          </div>
+          <div class="app-card-arrow">→</div>
+        </div>
+
+        <!-- SEO Analyzer -->
+        <div class="app-card-large" data-app="seoAnalyzer">
+          <div class="app-card-icon">📊</div>
+          <div class="app-card-content">
+            <h3>SEO Analyzer</h3>
+            <p>Audit the current page's search visibility and get recommendations</p>
+          </div>
+          <div class="app-card-arrow">→</div>
+        </div>
+
+        <!-- Quick Tools -->
+        <div class="app-card-large" data-app="quickTools">
+          <div class="app-card-icon">⚡</div>
+          <div class="app-card-content">
+            <h3>Quick Tools</h3>
+            <p>Translate, explain, fact-check, or convert selected text</p>
+          </div>
+          <div class="app-card-arrow">→</div>
+        </div>
+
+        <!-- Email Composer -->
+        <div class="app-card-large" data-app="emailComposer">
+          <div class="app-card-icon">✉️</div>
+          <div class="app-card-content">
+            <h3>Email Composer</h3>
+            <p>Draft professional emails with context-aware suggestions</p>
+          </div>
+          <div class="app-card-arrow">→</div>
+        </div>
+      </div>
+
+      <!-- Selection Quick Actions (shows when text selected) -->
+      <div class="selection-actions hidden" id="selectionActions">
+        <div class="selection-header">
+          <span class="selection-label">Selected text:</span>
+          <span class="selection-preview" id="selectionPreview"></span>
+        </div>
+        <div class="selection-buttons">
+          <button class="selection-btn" data-action="summarize">📝 Summarize</button>
+          <button class="selection-btn" data-action="explain">💡 Explain</button>
+          <button class="selection-btn" data-action="translate">🌍 Translate</button>
+          <button class="selection-btn" data-action="factcheck">✓ Fact Check</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page Digest Panel -->
+    <div id="pageDigestPanel" class="panel app-panel hidden">
+      <div class="app-header">
+        <button class="back-btn" data-back="home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <div class="app-title-area">
+          <span class="app-icon">📄</span>
+          <h2 class="app-title">Page Digest</h2>
+        </div>
+      </div>
+
+      <div class="app-body">
+        <!-- Page Info Card -->
+        <div class="page-info-card" id="pageInfoCard">
+          <div class="page-favicon" id="pageFavicon">📄</div>
+          <div class="page-details">
+            <div class="page-title" id="pageTitle">Loading...</div>
+            <div class="page-url" id="pageUrl"></div>
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <button class="btn btn-primary btn-full" id="digestPageBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+          Generate Digest
+        </button>
+
+        <!-- Loading State -->
+        <div class="digest-loading hidden" id="digestLoading">
+          <div class="loading-spinner"></div>
+          <div class="loading-status" id="loadingStatus">Analyzing page content...</div>
+        </div>
+
+        <!-- Results -->
+        <div class="digest-results hidden" id="digestResults">
+          <!-- Summary Section -->
+          <div class="digest-section">
+            <h3 class="digest-section-title">
+              <span>📋</span> Summary
+            </h3>
+            <div class="digest-summary" id="digestSummary"></div>
+          </div>
+
+          <!-- Key Points -->
+          <div class="digest-section">
+            <h3 class="digest-section-title">
+              <span>🎯</span> Key Points
+            </h3>
+            <div class="digest-points" id="digestPoints"></div>
+          </div>
+
+          <!-- Topics/Sections -->
+          <div class="digest-section">
+            <h3 class="digest-section-title">
+              <span>📑</span> Content Sections
+            </h3>
+            <div class="digest-sections" id="digestSections"></div>
+          </div>
+
+          <!-- Actions -->
+          <div class="digest-actions">
+            <button class="btn btn-sm" id="copyDigestBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+              </svg>
+              Copy
+            </button>
+            <button class="btn btn-sm" id="chatAboutPageBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px">
+                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+              </svg>
+              Ask Questions
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- YouTube Digest Panel -->
+    <div id="youtubeDigestPanel" class="panel app-panel hidden">
+      <div class="app-header">
+        <button class="back-btn" data-back="home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <div class="app-title-area">
+          <span class="app-icon">▶️</span>
+          <h2 class="app-title">YouTube Digest</h2>
+        </div>
+      </div>
+
+      <div class="app-body">
+        <!-- URL Input -->
+        <div class="youtube-input-group">
+          <div class="input-with-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px;color:#ff0000">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+            <input type="text" id="youtubeUrlInput" placeholder="Paste YouTube URL or video ID...">
+          </div>
+          <button class="btn btn-primary" id="summarizeVideoBtn">Summarize</button>
+        </div>
+
+        <!-- Video Preview (shows after URL entered) -->
+        <div class="video-preview hidden" id="videoPreview">
+          <div class="video-thumbnail" id="videoThumbnail"></div>
+          <div class="video-info">
+            <div class="video-title" id="videoTitle">Video Title</div>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="youtube-loading hidden" id="youtubeLoading">
+          <div class="loading-spinner"></div>
+          <div class="loading-status" id="ytLoadingStatus">Fetching video content...</div>
+        </div>
+
+        <!-- Results -->
+        <div class="youtube-results hidden" id="youtubeResults">
+          <!-- Tabs -->
+          <div class="result-tabs">
+            <button class="tab-btn active" data-tab="summary">Digest</button>
+            <button class="tab-btn" data-tab="transcript">Transcript</button>
+          </div>
+
+          <!-- Summary Tab -->
+          <div class="tab-content active" id="summaryTab">
+            <div class="yt-summary" id="ytSummary"></div>
+            <div class="yt-chapters" id="ytChapters"></div>
+          </div>
+
+          <!-- Transcript Tab -->
+          <div class="tab-content" id="transcriptTab">
+            <div class="yt-transcript" id="ytTranscript"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat with Page Panel -->
+    <div id="chatPanel" class="panel app-panel hidden">
+      <div class="app-header">
+        <button class="back-btn" data-back="home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <div class="app-title-area">
+          <span class="app-icon">💬</span>
+          <h2 class="app-title">Chat with Page</h2>
+        </div>
+        <button class="icon-btn" id="clearChatBtn" title="Clear chat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="chat-body">
+        <!-- Page Context Card -->
+        <div class="chat-context-card" id="chatContextCard">
+          <div class="context-icon">📄</div>
+          <div class="context-text">
+            <span id="chatPageTitle">Loading page...</span>
+          </div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-welcome">
+            <div class="welcome-icon">💬</div>
+            <h3>Ask anything about this page</h3>
+            <p>I've read the content and can answer questions, explain concepts, or find specific information.</p>
+            <div class="suggested-questions" id="suggestedQuestions">
+              <button class="suggested-btn">What is this page about?</button>
+              <button class="suggested-btn">What are the key points?</button>
+              <button class="suggested-btn">Summarize in 3 bullets</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Input -->
+        <div class="chat-input-area">
+          <div class="chat-input-wrapper">
+            <textarea id="chatInput" placeholder="Ask a question about this page..." rows="1"></textarea>
+            <button class="send-btn" id="sendChatBtn" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEO Analyzer Panel -->
+    <div id="seoPanel" class="panel app-panel hidden">
+      <div class="app-header">
+        <button class="back-btn" data-back="home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <div class="app-title-area">
+          <span class="app-icon">📊</span>
+          <h2 class="app-title">SEO Analyzer</h2>
+        </div>
+      </div>
+
+      <div class="app-body">
+        <!-- Page Info -->
+        <div class="seo-page-info" id="seoPageInfo">
+          <div class="seo-url" id="seoUrl">Loading...</div>
+        </div>
+
+        <!-- Analyze Button -->
+        <button class="btn btn-primary btn-full" id="analyzeSeoBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px">
+            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          Analyze SEO
+        </button>
+
+        <!-- Loading -->
+        <div class="seo-loading hidden" id="seoLoading">
+          <div class="loading-spinner"></div>
+          <div class="loading-steps">
+            <div class="loading-step active" id="step1">Fetching page metadata...</div>
+            <div class="loading-step" id="step2">Analyzing content structure...</div>
+            <div class="loading-step" id="step3">Checking search visibility...</div>
+            <div class="loading-step" id="step4">Generating recommendations...</div>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div class="seo-results hidden" id="seoResults">
+          <!-- Score Card -->
+          <div class="seo-score-card">
+            <div class="score-ring" id="scoreRing">
+              <svg viewBox="0 0 120 120">
+                <circle class="score-bg" cx="60" cy="60" r="54" fill="none" stroke-width="12"/>
+                <circle class="score-fill" cx="60" cy="60" r="54" fill="none" stroke-width="12" id="scoreFill"/>
+              </svg>
+              <div class="score-value" id="scoreValue">--</div>
+            </div>
+            <div class="score-label">SEO Score</div>
+            <div class="score-verdict" id="scoreVerdict"></div>
+          </div>
+
+          <!-- Issues -->
+          <div class="seo-section">
+            <h3 class="seo-section-title issues">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              Issues Found
+            </h3>
+            <div class="seo-issues-list" id="seoIssuesList"></div>
+          </div>
+
+          <!-- Recommendations -->
+          <div class="seo-section">
+            <h3 class="seo-section-title recommendations">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px">
+                <path d="M9 12l2 2 4-4"/>
+                <circle cx="12" cy="12" r="10"/>
+              </svg>
+              Recommendations
+            </h3>
+            <div class="seo-recommendations-list" id="seoRecommendationsList"></div>
+          </div>
+
+          <!-- Meta Details -->
+          <div class="seo-section">
+            <h3 class="seo-section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+              </svg>
+              Page Meta
+            </h3>
+            <div class="seo-meta-list" id="seoMetaList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Tools Panel -->
+    <div id="quickToolsPanel" class="panel app-panel hidden">
+      <div class="app-header">
+        <button class="back-btn" data-back="home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <div class="app-title-area">
+          <span class="app-icon">⚡</span>
+          <h2 class="app-title">Quick Tools</h2>
+        </div>
+      </div>
+
+      <div class="app-body">
+        <!-- Tool Selector -->
+        <div class="tool-selector">
+          <button class="tool-tab active" data-tool="translate">🌍 Translate</button>
+          <button class="tool-tab" data-tool="explain">💡 Explain</button>
+          <button class="tool-tab" data-tool="bullets">📋 Bullets</button>
+          <button class="tool-tab" data-tool="factcheck">✓ Fact Check</button>
+          <button class="tool-tab" data-tool="rewrite">✏️ Rewrite</button>
+        </div>
+
+        <!-- Input Area -->
+        <div class="tool-input-area">
+          <div class="input-header">
+            <span class="input-label">Input</span>
+            <button class="btn btn-sm" id="pasteSelectionBtn">Paste Selection</button>
+          </div>
+          <textarea id="toolInput" placeholder="Enter or paste text here..." rows="5"></textarea>
+          <div class="input-char-count" id="toolCharCount">0 characters</div>
+        </div>
+
+        <!-- Tool Options -->
+        <div class="tool-options" id="toolOptions">
+          <!-- Dynamic options per tool -->
+        </div>
+
+        <!-- Process Button -->
+        <button class="btn btn-primary btn-full" id="processToolBtn">
+          <span id="processToolText">Process</span>
+        </button>
+
+        <!-- Loading -->
+        <div class="tool-loading hidden" id="toolLoading">
+          <div class="loading-spinner"></div>
+          <span>Processing...</span>
+        </div>
+
+        <!-- Output -->
+        <div class="tool-output hidden" id="toolOutput">
+          <div class="output-header">
+            <span class="output-label">Result</span>
+            <button class="btn btn-sm" id="copyToolOutput">Copy</button>
+          </div>
+          <div class="output-content" id="toolOutputContent"></div>
+          <div class="output-sources hidden" id="toolSources">
+            <span class="sources-label">Sources</span>
+            <div class="sources-list" id="toolSourcesList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Email Composer Panel -->
+    <div id="emailPanel" class="panel app-panel hidden">
+      <div class="app-header">
+        <button class="back-btn" data-back="home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <div class="app-title-area">
+          <span class="app-icon">✉️</span>
+          <h2 class="app-title">Email Composer</h2>
+        </div>
+      </div>
+
+      <div class="app-body">
+        <!-- Scenario Selector -->
+        <div class="email-scenarios">
+          <button class="scenario-btn active" data-scenario="reply">💬 Reply</button>
+          <button class="scenario-btn" data-scenario="followup">🔄 Follow-up</button>
+          <button class="scenario-btn" data-scenario="request">🙋 Request</button>
+          <button class="scenario-btn" data-scenario="difficult">😓 Difficult</button>
+        </div>
+
+        <!-- Context Input -->
+        <div class="email-context">
+          <label>Context / Original Message</label>
+          <textarea id="emailContext" placeholder="Paste the email you're replying to, or describe the situation..." rows="4"></textarea>
+        </div>
+
+        <!-- Tone Selector -->
+        <div class="email-tone">
+          <label>Tone</label>
+          <div class="tone-buttons">
+            <button class="tone-btn active" data-tone="professional">Professional</button>
+            <button class="tone-btn" data-tone="friendly">Friendly</button>
+            <button class="tone-btn" data-tone="direct">Direct</button>
+            <button class="tone-btn" data-tone="empathetic">Empathetic</button>
+          </div>
+        </div>
+
+        <!-- Generate Button -->
+        <button class="btn btn-primary btn-full" id="generateEmailBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          Generate Email
+        </button>
+
+        <!-- Loading -->
+        <div class="email-loading hidden" id="emailLoading">
+          <div class="loading-spinner"></div>
+          <span>Composing email...</span>
+        </div>
+
+        <!-- Result -->
+        <div class="email-result hidden" id="emailResult">
+          <div class="email-output">
+            <div class="email-subject-line">
+              <label>Subject</label>
+              <div class="email-subject" id="emailSubject"></div>
+            </div>
+            <div class="email-body-output">
+              <label>Body</label>
+              <div class="email-body" id="emailBody"></div>
+            </div>
+          </div>
+          <div class="email-tips" id="emailTips">
+            <h4>Tips</h4>
+            <ul id="emailTipsList"></ul>
+          </div>
+          <div class="email-actions">
+            <button class="btn btn-sm" id="copyEmailBtn">Copy Email</button>
+            <button class="btn btn-sm btn-primary" id="regenerateEmailBtn">Regenerate</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div id="settingsPanel" class="panel hidden">
+      <div class="panel-header">
+        <button class="back-btn" data-back="home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <h3>Settings</h3>
+      </div>
+
+      <div class="settings-content">
+        <div class="settings-section">
+          <h4>API Key</h4>
+          <div class="setting-item">
+            <div class="input-with-btn">
+              <input type="password" id="settingsApiKey" placeholder="Enter API key">
+              <button class="btn btn-sm" id="updateApiKeyBtn">Update</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h4>Preferences</h4>
+          <div class="setting-item">
+            <label>Default Language</label>
+            <select id="defaultLanguage">
+              <option value="English">English</option>
+              <option value="Spanish">Spanish</option>
+              <option value="French">French</option>
+              <option value="German">German</option>
+              <option value="Chinese">Chinese</option>
+              <option value="Japanese">Japanese</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h4>About</h4>
+          <div class="about-info">
+            <p><strong>MicroLabs AI Tools</strong></p>
+            <p class="muted">Version 2.0.0</p>
+            <p class="muted">Powered by Google Gemini</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="sidepanel.js"></script>
+</body>
+</html>

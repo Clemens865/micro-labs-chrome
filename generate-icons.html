@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate PNG Icons</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #1a1a24; color: white; }
+    canvas { display: block; margin: 10px 0; background: white; }
+    a { display: block; margin: 10px 0; color: #818cf8; }
+    .container { display: flex; flex-wrap: wrap; gap: 20px; }
+    .icon-box { text-align: center; }
+  </style>
+</head>
+<body>
+  <h1>MicroLabs Icon Generator</h1>
+  <p>Right-click each canvas and "Save image as..." to save the PNG files.</p>
+  <div class="container">
+    <div class="icon-box">
+      <h3>icon16.png</h3>
+      <canvas id="icon16" width="16" height="16"></canvas>
+    </div>
+    <div class="icon-box">
+      <h3>icon32.png</h3>
+      <canvas id="icon32" width="32" height="32"></canvas>
+    </div>
+    <div class="icon-box">
+      <h3>icon48.png</h3>
+      <canvas id="icon48" width="48" height="48"></canvas>
+    </div>
+    <div class="icon-box">
+      <h3>icon128.png</h3>
+      <canvas id="icon128" width="128" height="128"></canvas>
+    </div>
+  </div>
+
+  <script>
+    function drawIcon(canvasId, size) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      const radius = size * 0.1875; // Rounded corners
+
+      // Background
+      ctx.fillStyle = '#6366F1';
+      ctx.beginPath();
+      ctx.roundRect(0, 0, size, size, radius);
+      ctx.fill();
+
+      // Draw the layered diamond/logo shape
+      ctx.fillStyle = 'white';
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = size * 0.047;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      const cx = size / 2;
+      const margin = size * 0.25;
+      const top = size * 0.22;
+      const mid1 = size * 0.5;
+      const mid2 = size * 0.64;
+      const bottom = size * 0.78;
+
+      // Top filled diamond
+      ctx.beginPath();
+      ctx.moveTo(cx, top);
+      ctx.lineTo(margin, (top + mid1) / 2);
+      ctx.lineTo(cx, mid1);
+      ctx.lineTo(size - margin, (top + mid1) / 2);
+      ctx.closePath();
+      ctx.fill();
+
+      // Middle line
+      ctx.beginPath();
+      ctx.moveTo(margin, mid1);
+      ctx.lineTo(cx, mid2);
+      ctx.lineTo(size - margin, mid1);
+      ctx.stroke();
+
+      // Bottom line
+      ctx.beginPath();
+      ctx.moveTo(margin, mid2);
+      ctx.lineTo(cx, bottom);
+      ctx.lineTo(size - margin, mid2);
+      ctx.stroke();
+    }
+
+    // Generate all sizes
+    drawIcon('icon16', 16);
+    drawIcon('icon32', 32);
+    drawIcon('icon48', 48);
+    drawIcon('icon128', 128);
+
+    // Auto-download option
+    document.querySelectorAll('canvas').forEach(canvas => {
+      const link = document.createElement('a');
+      link.download = canvas.id + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.textContent = 'Download ' + canvas.id + '.png';
+      canvas.parentElement.appendChild(link);
+    });
+  </script>
+</body>
+</html>

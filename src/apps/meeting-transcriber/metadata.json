@@ -1,0 +1,21 @@
+{
+    "id": "meeting-transcriber",
+    "title": "Meeting Transcriber",
+    "description": "Live meeting transcription with AI-powered summaries, action items, and export options.",
+    "icon": "Video",
+    "category": "Productivity",
+    "tags": ["meeting", "transcription", "STT", "speech-to-text", "collaboration", "productivity"],
+    "features": [
+        "Real-time speech-to-text transcription",
+        "Auto-detect meeting platform (Zoom, Meet, Teams)",
+        "AI-generated meeting summaries",
+        "Action item extraction",
+        "Decision tracking",
+        "Timestamp annotations",
+        "Export to TXT, SRT, JSON formats",
+        "Multi-language support",
+        "Pause/resume recording"
+    ],
+    "permissions": ["microphone"],
+    "version": "1.0.0"
+}
