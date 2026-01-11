@@ -31,6 +31,16 @@
   -webkit-font-smoothing: antialiased;
 }
 
+/* Reset button styles to match dark theme */
+button {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+}
+
 html,
 body,
 #root {

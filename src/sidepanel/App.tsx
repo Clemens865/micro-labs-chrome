@@ -1,6 +1,6 @@
 import React, { useState, Suspense, useMemo, useEffect, useCallback } from 'react';
-import { Search, Settings, Home, MessageSquare, Globe, Mail, Youtube, Zap, Map as MapIcon, Loader2, Target, Briefcase, GraduationCap, ShieldCheck, History, Trash2, ChevronRight, Clock, Heart, Plane, Code2, Utensils, CheckCircle, Share2, ClipboardList, Terminal, Palette, Baby, Lightbulb, UserCheck, FileText, MessageSquareReply, Layers, ListChecks, Megaphone, PenTool, Bug, BookOpen, Languages, RefreshCw, ExternalLink, FileCode, ShoppingCart, Newspaper, MessageCircle, HelpCircle, AlertCircle, Pen, Star, TrendingUp, Keyboard, Download, Copy, FileJson, User, Building2, Phone, Link, Save, ChevronDown, ChevronUp, Award, Sparkles, Plus, X, Scale } from 'lucide-react';
-import { appRegistry, getAppComponent, AppMetadata, getGenericConfig } from '../apps/AppRegistry';
+import { Search, Settings, Home, MessageSquare, Globe, Mail, Youtube, Zap, Map as MapIcon, Loader2, Target, Briefcase, GraduationCap, ShieldCheck, History, Trash2, ChevronRight, Clock, Heart, Plane, Code2, Utensils, CheckCircle, Share2, ClipboardList, Terminal, Palette, Baby, Lightbulb, UserCheck, FileText, MessageSquareReply, Layers, ListChecks, Megaphone, PenTool, Bug, BookOpen, Languages, RefreshCw, ExternalLink, FileCode, ShoppingCart, Newspaper, MessageCircle, HelpCircle, AlertCircle, Pen, Star, TrendingUp, Keyboard, Download, Copy, FileJson, User, Building2, Phone, Link, Save, ChevronDown, ChevronUp, Award, Sparkles, Plus, X, Scale, Webhook, Send, MousePointerClick, Headphones, Activity, DollarSign, Eye, MessageSquareQuote, Flag, Gauge, Table, Clipboard, Image, Wand2 } from 'lucide-react';
+import { appRegistry, getAppComponent, AppMetadata, getGenericConfig, categoryConfig } from '../apps/AppRegistry';
 import GenericApp from '../apps/GenericApp';
 import { usePageContext, SiteType } from '../hooks/usePageContext';
 import ErrorBoundary from '../components/ErrorBoundary';
@@ -10,6 +10,8 @@ import { useToast } from '../hooks/useToast';
 import { useAppStats } from '../hooks/useAppStats';
 import { useUserProfile, UserProfile, Experience } from '../hooks/useUserProfile';
 import ToastContainer from '../components/ToastContainer';
+import IntegrationsSettings from '../components/IntegrationsSettings';
+import { useIntegrations } from '../hooks/useIntegrations';
 
 const App: React.FC = () => {
     const { context, suggestedApps, siteType, isLoading: contextLoading, refreshContext } = usePageContext();
@@ -18,10 +20,12 @@ const App: React.FC = () => {
     const { toasts, dismissToast, success, info, warning } = useToast();
     const { trackUsage, getPopularApps, totalUsageCount } = useAppStats();
     const { profile, saveProfile, hasProfile, loading: profileLoading } = useUserProfile();
+    const { integrations } = useIntegrations();
     const [currentAppId, setCurrentAppId] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [showSettings, setShowSettings] = useState(false);
     const [showHistory, setShowHistory] = useState(false);
+    const [showIntegrations, setShowIntegrations] = useState(false);
     const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
     const [apiKey, setApiKey] = useState('');
     const [profileForm, setProfileForm] = useState<UserProfile>(profile);
@@ -29,6 +33,7 @@ const App: React.FC = () => {
     const [companySectionExpanded, setCompanySectionExpanded] = useState(false);
     const [outreachSectionExpanded, setOutreachSectionExpanded] = useState(false);
     const [personalSectionExpanded, setPersonalSectionExpanded] = useState(false);
+    const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
 
     // Update profile form when profile loads
     useEffect(() => {
@@ -96,6 +101,29 @@ const App: React.FC = () => {
             case 'svg-icon-generator': return <Pen size={size} />;
             case 'terms-analyzer': return <Scale size={size} />;
             case 'console-monitor': return <Terminal size={size} />;
+            case 'crm-lead-pusher': return <Send size={size} />;
+            case 'workflow-recorder': return <MousePointerClick size={size} />;
+            case 'meeting-notes-jira': return <ClipboardList size={size} />;
+            case 'support-ticket-prefiller': return <Headphones size={size} />;
+            case 'api-endpoint-mapper': return <Globe size={size} />;
+            case 'event-tracking-validator': return <Activity size={size} />;
+            case 'competitor-prd': return <Target size={size} />;
+            case 'code-clone-blueprint': return <Code2 size={size} />;
+            case 'content-repurposer': return <RefreshCw size={size} />;
+            case 'error-log-parser': return <Bug size={size} />;
+            case 'competitor-pricing-monitor': return <DollarSign size={size} />;
+            case 'competitor-ad-spy': return <Eye size={size} />;
+            case 'social-proof-harvester': return <MessageSquareQuote size={size} />;
+            case 'feature-flag-detector': return <Flag size={size} />;
+            case 'performance-budget-enforcer': return <Gauge size={size} />;
+            case 'job-application-assistant': return <Briefcase size={size} />;
+            case 'interview-question-generator': return <MessageSquare size={size} />;
+            case 'privacy-policy-diff-tracker': return <Scale size={size} />;
+            case 'contract-clause-extractor': return <FileText size={size} />;
+            case 'data-table-extractor': return <Table size={size} />;
+            case 'smart-clipboard-manager': return <Clipboard size={size} />;
+            case 'image-editor': return <Image size={size} />;
+            case 'pixel-alchemy': return <Wand2 size={size} />;
             default: return <Zap size={size} />;
         }
     };
@@ -209,7 +237,8 @@ const App: React.FC = () => {
 
             // Escape to go back
             if (e.key === 'Escape') {
-                if (showSettings) setShowSettings(false);
+                if (showIntegrations) setShowIntegrations(false);
+                else if (showSettings) setShowSettings(false);
                 else if (showHistory) setShowHistory(false);
                 else if (showKeyboardHelp) setShowKeyboardHelp(false);
                 else if (currentAppId) setCurrentAppId(null);
@@ -252,7 +281,16 @@ const App: React.FC = () => {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [currentAppId, showSettings, showHistory, showKeyboardHelp, favoriteApps, handleSelectApp]);
+    }, [currentAppId, showSettings, showHistory, showKeyboardHelp, showIntegrations, favoriteApps, handleSelectApp]);
+
+    // Listen for integrations settings open event from SendToIntegrations component
+    useEffect(() => {
+        const handleOpenIntegrations = () => {
+            setShowIntegrations(true);
+        };
+        window.addEventListener('open-integrations-settings', handleOpenIntegrations);
+        return () => window.removeEventListener('open-integrations-settings', handleOpenIntegrations);
+    }, []);
 
     useEffect(() => {
         chrome.runtime.sendMessage({ type: 'GET_API_KEY' }, (response) => {
@@ -310,6 +348,61 @@ const App: React.FC = () => {
             app.description.toLowerCase().includes(searchQuery.toLowerCase())
         );
     }, [searchQuery]);
+
+    // Group apps by category
+    const groupedApps = useMemo(() => {
+        const groups: Record<string, AppMetadata[]> = {};
+
+        filteredApps.forEach(app => {
+            const category = app.category || 'Other';
+            if (!groups[category]) {
+                groups[category] = [];
+            }
+            groups[category].push(app);
+        });
+
+        // Sort categories by order defined in categoryConfig
+        const sortedCategories = Object.keys(groups).sort((a, b) => {
+            const orderA = categoryConfig[a]?.order ?? 99;
+            const orderB = categoryConfig[b]?.order ?? 99;
+            return orderA - orderB;
+        });
+
+        return sortedCategories.map(category => ({
+            category,
+            apps: groups[category],
+            config: categoryConfig[category] || { label: category, icon: 'Zap', color: 'slate', order: 99 }
+        }));
+    }, [filteredApps]);
+
+    // Toggle category collapse
+    const toggleCategoryCollapse = (category: string) => {
+        setCollapsedCategories(prev => {
+            const next = new Set(prev);
+            if (next.has(category)) {
+                next.delete(category);
+            } else {
+                next.add(category);
+            }
+            return next;
+        });
+    };
+
+    // Get category accent color (HSL values for inline styles)
+    const getCategoryColor = (color: string): string => {
+        const colors: Record<string, string> = {
+            blue: 'hsl(217 91% 60%)',
+            emerald: 'hsl(160 84% 39%)',
+            purple: 'hsl(271 91% 65%)',
+            cyan: 'hsl(192 91% 50%)',
+            red: 'hsl(0 84% 60%)',
+            orange: 'hsl(25 95% 53%)',
+            yellow: 'hsl(45 93% 47%)',
+            pink: 'hsl(330 80% 60%)',
+            slate: 'hsl(215 20% 65%)',
+        };
+        return colors[color] || colors.slate;
+    };
 
     const CurrentAppComponent = useMemo(() => {
         if (!currentAppId) return null;
@@ -838,6 +931,33 @@ const App: React.FC = () => {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Integrations Section */}
+                        <div className="card p-5">
+                            <button
+                                onClick={() => setShowIntegrations(true)}
+                                className="w-full flex items-center justify-between"
+                            >
+                                <h2 className="text-lg font-black flex items-center gap-2">
+                                    <Webhook size={18} className="text-cyan-500" /> Integrations
+                                </h2>
+                                <div className="flex items-center gap-2">
+                                    {integrations.length > 0 && (
+                                        <span className="text-[10px] px-2 py-0.5 bg-cyan-500/10 text-cyan-400 rounded-full font-bold">
+                                            {integrations.filter(i => i.enabled).length} Active
+                                        </span>
+                                    )}
+                                    <ChevronRight size={16} className="text-slate-500" />
+                                </div>
+                            </button>
+                            <p className="text-xs text-dim mt-2">
+                                Send app outputs to Slack, HubSpot, Notion, Zapier & more
+                            </p>
+                        </div>
+                    </div>
+                ) : showIntegrations ? (
+                    <div className="animate-in h-full">
+                        <IntegrationsSettings onBack={() => setShowIntegrations(false)} />
                     </div>
                 ) : showHistory ? (
                     <div className="space-y-6 animate-in">
@@ -1033,7 +1153,7 @@ const App: React.FC = () => {
                                                     <Star size={14} style={{ fill: isFavorite(suggestion.id) ? 'hsl(45 93% 47%)' : 'none' }} />
                                                 </button>
                                                 {idx === 0 && (
-                                                    <span className="text-[8px] px-2 py-0.5 bg-blue-600 text-white rounded-full font-bold uppercase">
+                                                    <span className="text-[8px] px-2 py-0.5 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full font-bold uppercase">
                                                         Best Match
                                                     </span>
                                                 )}
@@ -1144,7 +1264,19 @@ const App: React.FC = () => {
 
                         <section className="space-y-4">
                             <div className="flex items-center justify-between px-1">
-                                <h2 className="text-xs uppercase-tracking text-dim">Full Library ({appRegistry.length})</h2>
+                                <h2 className="text-xs uppercase-tracking text-dim">App Library ({appRegistry.length})</h2>
+                                <button
+                                    onClick={() => {
+                                        if (collapsedCategories.size === groupedApps.length) {
+                                            setCollapsedCategories(new Set());
+                                        } else {
+                                            setCollapsedCategories(new Set(groupedApps.map(g => g.category)));
+                                        }
+                                    }}
+                                    className="text-[10px] text-slate-500 hover:text-slate-300 font-medium"
+                                >
+                                    {collapsedCategories.size === groupedApps.length ? 'Expand All' : 'Collapse All'}
+                                </button>
                             </div>
                             <div className="relative">
                                 <input
@@ -1156,48 +1288,82 @@ const App: React.FC = () => {
                                 />
                                 <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
                             </div>
-                            <div className="grid grid-cols-1 gap-2.5">
-                                {filteredApps.map(app => (
-                                    <div
-                                        key={app.id}
-                                        onClick={() => handleSelectApp(app.id)}
-                                        className="card p-3 flex items-center gap-4 cursor-pointer group"
-                                    >
-                                        <div className="w-10 h-10 rounded-xl bg-slate-700/50 flex items-center justify-center text-slate-400 group-hover:text-blue-400">
-                                            {renderAppIcon(app.id)}
+
+                            {/* Grouped Categories - Compact list style */}
+                            <div className="space-y-2">
+                                {groupedApps.map(({ category, apps, config }) => {
+                                    const isCollapsed = collapsedCategories.has(category);
+
+                                    return (
+                                        <div key={category}>
+                                            {/* Category Divider - subtle inline label */}
+                                            <button
+                                                onClick={() => toggleCategoryCollapse(category)}
+                                                className="w-full flex items-center gap-2 py-2 group"
+                                            >
+                                                <div
+                                                    className="h-[1px] flex-1"
+                                                    style={{ background: 'hsl(222 47% 18%)' }}
+                                                />
+                                                <span className="text-[9px] uppercase font-bold tracking-wider text-slate-500 group-hover:text-slate-400 transition-colors flex items-center gap-1">
+                                                    {config.label}
+                                                    <span className="text-slate-600">·</span>
+                                                    <span className="text-slate-600">{apps.length}</span>
+                                                    {isCollapsed ? <ChevronRight size={10} /> : <ChevronDown size={10} />}
+                                                </span>
+                                                <div
+                                                    className="h-[1px] flex-1"
+                                                    style={{ background: 'hsl(222 47% 18%)' }}
+                                                />
+                                            </button>
+
+                                            {/* Apps in Category */}
+                                            {!isCollapsed && (
+                                                <div className="grid grid-cols-1 gap-2">
+                                                    {apps.map(app => (
+                                                        <div
+                                                            key={app.id}
+                                                            onClick={() => handleSelectApp(app.id)}
+                                                            className="card p-3 flex items-center gap-4 cursor-pointer group"
+                                                        >
+                                                            <div className="w-10 h-10 rounded-xl bg-slate-700/50 flex items-center justify-center text-slate-400 group-hover:text-blue-400 transition-colors">
+                                                                {renderAppIcon(app.id)}
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <h3 className="text-sm font-bold">{app.title}</h3>
+                                                                <p className="text-xs text-dim line-clamp-1">{app.description}</p>
+                                                            </div>
+                                                            <button
+                                                                onClick={(e) => handleToggleFavorite(app.id, e)}
+                                                                style={{
+                                                                    padding: '8px',
+                                                                    borderRadius: '8px',
+                                                                    background: 'transparent',
+                                                                    border: 'none',
+                                                                    color: isFavorite(app.id) ? 'hsl(45 93% 47%)' : 'hsl(215 20% 30%)',
+                                                                    cursor: 'pointer',
+                                                                    transition: 'all 0.2s ease'
+                                                                }}
+                                                                onMouseEnter={(e) => {
+                                                                    e.currentTarget.style.color = 'hsl(45 93% 47%)';
+                                                                    e.currentTarget.style.background = 'hsl(222 47% 15%)';
+                                                                }}
+                                                                onMouseLeave={(e) => {
+                                                                    e.currentTarget.style.background = 'transparent';
+                                                                    if (!isFavorite(app.id)) {
+                                                                        e.currentTarget.style.color = 'hsl(215 20% 30%)';
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <Star size={16} style={{ fill: isFavorite(app.id) ? 'hsl(45 93% 47%)' : 'none' }} />
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h3 className="text-sm font-bold">{app.title}</h3>
-                                            <p className="text-xs text-dim line-clamp-1">{app.description}</p>
-                                        </div>
-                                        <button
-                                            onClick={(e) => handleToggleFavorite(app.id, e)}
-                                            style={{
-                                                padding: '8px',
-                                                borderRadius: '8px',
-                                                background: 'transparent',
-                                                border: 'none',
-                                                color: isFavorite(app.id) ? 'hsl(45 93% 47%)' : 'hsl(215 20% 40%)',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.2s ease',
-                                                opacity: isFavorite(app.id) ? 1 : 0
-                                            }}
-                                            className="group-hover:!opacity-100"
-                                            onMouseEnter={(e) => {
-                                                e.currentTarget.style.color = 'hsl(45 93% 47%)';
-                                                e.currentTarget.style.background = 'hsl(222 47% 15%)';
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                e.currentTarget.style.background = 'transparent';
-                                                if (!isFavorite(app.id)) {
-                                                    e.currentTarget.style.color = 'hsl(215 20% 40%)';
-                                                }
-                                            }}
-                                        >
-                                            <Star size={16} style={{ fill: isFavorite(app.id) ? 'hsl(45 93% 47%)' : 'none' }} />
-                                        </button>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                                 {filteredApps.length === 0 && (
                                     <div className="text-center py-12 text-dim text-sm card border-dashed">
                                         No apps found matching "{searchQuery}"

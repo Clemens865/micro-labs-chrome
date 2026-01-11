@@ -217,14 +217,15 @@ export const useGemini = () => {
 
             const ai = new GoogleGenAI({ apiKey });
 
-            // Use Gemini 2.5 Flash Image model for image generation (same as original MicroLabs apps)
+            // Use Gemini 2.5 Flash Image model for image generation (Nano Banana)
+            // See: https://ai.google.dev/gemini-api/docs/image-generation
             const response = await ai.models.generateContent({
                 model: 'gemini-2.5-flash-image',
                 contents: {
                     parts: [{ text: prompt }]
                 },
                 config: {
-                    systemInstruction: 'You are an image generation AI. Generate high-quality images based on the prompt. OUTPUT: ONLY the image data. NO TEXT.'
+                    responseModalities: ['image', 'text'],
                 }
             });
 
@@ -233,9 +234,15 @@ export const useGemini = () => {
             if (response.candidates?.[0]?.content?.parts) {
                 for (const part of response.candidates[0].content.parts) {
                     if (part.inlineData?.data) {
-                        images.push(part.inlineData.data);
+                        // Return with data URL prefix for easier use
+                        const mimeType = part.inlineData.mimeType || 'image/png';
+                        images.push(`data:${mimeType};base64,${part.inlineData.data}`);
                     }
                 }
+            }
+
+            if (images.length === 0) {
+                throw new Error('No images were generated. The model may not support image generation for this prompt.');
             }
 
             return images;
