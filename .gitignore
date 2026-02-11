@@ -57,3 +57,12 @@ coverage/
 # Temporary files
 *.tmp
 *.temp
+
+# Claude development files - not needed in repo
+CLAUDE.md
+.claude/
+GEMINI_SDK_REFERENCE.md
+GOOGLE_AI_API.md
+
+# Legacy code
+legacy/

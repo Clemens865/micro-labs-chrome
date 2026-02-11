@@ -18,7 +18,8 @@ import {
     Database,
     Layout,
     GitBranch,
-    Server
+    Server,
+    Monitor
 } from 'lucide-react';
 import { useGemini } from '../../hooks/useGemini';
 import { usePageContext } from '../../hooks/usePageContext';
@@ -74,6 +75,13 @@ interface Blueprint {
         tasks: string[];
         deliverables: string[];
     }[];
+    uiBlueprints: {
+        name: string;
+        route: string;
+        description: string;
+        layout: string;
+        components: { name: string; type: string; description: string }[];
+    }[];
     estimatedCost: {
         development: string;
         monthly: string;
@@ -93,6 +101,55 @@ const CodeCloneBlueprintApp: React.FC = () => {
     const [copied, setCopied] = useState(false);
     const [expandedSection, setExpandedSection] = useState<string | null>('architecture');
     const [targetStack, setTargetStack] = useState<string>('modern');
+
+    // Normalize AI response: unwrap nested objects and map snake_case keys
+    const normalizeResponse = (raw: any): any => {
+        if (!raw || typeof raw !== 'object') return raw;
+
+        // If the AI wrapped everything in a single key like "blueprint", unwrap it
+        const keys = Object.keys(raw);
+        if (keys.length === 1 && typeof raw[keys[0]] === 'object' && !Array.isArray(raw[keys[0]])) {
+            const inner = raw[keys[0]];
+            // Check if inner looks more like a blueprint than outer
+            if (inner.productName || inner.product_name || inner.techStack || inner.tech_stack) {
+                raw = inner;
+            }
+        }
+
+        // Map snake_case to camelCase for known fields
+        const get = (camel: string, snake: string) => raw[camel] ?? raw[snake];
+
+        const arch = get('architecture', 'architecture') || {};
+        const ts = get('techStack', 'tech_stack') || {};
+        const cost = get('estimatedCost', 'estimated_cost') || {};
+
+        return {
+            productName: get('productName', 'product_name'),
+            description: raw.description,
+            architecture: {
+                type: arch.type,
+                description: arch.description,
+                diagram: arch.diagram,
+            },
+            techStack: {
+                frontend: ts.frontend || [],
+                backend: ts.backend || [],
+                database: ts.database || [],
+                infrastructure: ts.infrastructure || [],
+                thirdParty: ts.thirdParty || ts.third_party || ts.thirdparty || [],
+            },
+            coreFeatures: get('coreFeatures', 'core_features') || [],
+            dataModels: get('dataModels', 'data_models') || [],
+            apiEndpoints: get('apiEndpoints', 'api_endpoints') || [],
+            uiBlueprints: get('uiBlueprints', 'ui_blueprints') || [],
+            developmentPhases: get('developmentPhases', 'development_phases') || [],
+            estimatedCost: {
+                development: cost.development,
+                monthly: cost.monthly,
+                breakdown: cost.breakdown || [],
+            },
+        };
+    };
 
     const extractFromPage = () => {
         if (context?.content) {
@@ -119,51 +176,95 @@ const CodeCloneBlueprintApp: React.FC = () => {
                     'Vue + Python Django + PostgreSQL';
 
             const result = await generateContent(
-                `Analyze this product and create a comprehensive technical blueprint for building a clone:
+                `Analyze this product and create a comprehensive technical blueprint for building a clone.
 
+Product info:
 ${inputText}
 
 Product URL: ${context?.url || 'unknown'}
 Product Title: ${context?.title || 'unknown'}
 Target Stack: ${stackPreference}
 
-Generate a complete implementation blueprint with:
+CRITICAL RULES:
+- Identify what the product ACTUALLY uses by analyzing evidence from the page (e.g. a Google product uses Google Gemini, NOT OpenAI).
+- Look at the URL domain, branding, page content for clues about the real tech stack.
+- Do NOT default to "OpenAI" for AI features - determine the actual provider from context.
+- The "Target Stack" above is ONLY for frontend/backend framework suggestions. Third-party services and AI providers must reflect what the product really uses.
 
-1. Product Overview - Name and description
-2. Architecture - Type (monolith, microservices, serverless), description, ASCII diagram
-3. Tech Stack - For each layer (frontend, backend, database, infrastructure, third-party):
-   - Component name, type, purpose
-   - Alternative options
-   - Implementation notes
-4. Core Features - Each feature with:
-   - Name, description
-   - Implementation approach
-   - Required APIs
-5. Data Models - Each model with:
-   - Name, fields (name, type, required)
-   - Relationships to other models
-6. API Endpoints - Each endpoint with:
-   - Method, path, description
-   - Request/response examples
-7. Development Phases - Each phase with:
-   - Phase number, name, duration
-   - Tasks and deliverables
-8. Cost Estimates - Development cost, monthly running cost, breakdown
+Return a JSON object with EXACTLY these keys (camelCase):
 
-Return as JSON matching the Blueprint interface structure.`,
-                `You are a senior software architect specializing in product engineering.
-Create detailed, implementable blueprints that developers can follow to build the product.
-Be specific about:
-- Technology choices and why
-- Data model relationships
-- API design patterns
-- Implementation complexities
-- Realistic cost estimates`,
-                { jsonMode: true }
+{
+  "productName": "string",
+  "description": "string - what the product does",
+  "architecture": {
+    "type": "string - e.g. Monolith, Microservices, Serverless",
+    "description": "string - how the architecture works",
+    "diagram": "string - ASCII architecture diagram using box-drawing chars"
+  },
+  "techStack": {
+    "frontend": [{"name":"string","type":"framework|library|service|database|api","purpose":"string","alternatives":["string"],"implementation":"string"}],
+    "backend": [same shape as frontend],
+    "database": [same shape],
+    "infrastructure": [same shape],
+    "thirdParty": [same shape]
+  },
+  "coreFeatures": [{"name":"string","description":"string","implementation":"string","apis":["string"]}],
+  "dataModels": [{"name":"string","fields":[{"name":"string","type":"string","required":true}],"relationships":["string"]}],
+  "apiEndpoints": [{"method":"GET|POST|PUT|DELETE","path":"string","description":"string"}],
+  "uiBlueprints": [
+    {
+      "name": "string - page name (e.g. Dashboard, Editor, Settings)",
+      "route": "string - URL route (e.g. /dashboard, /notebook/:id)",
+      "description": "string - what this page does",
+      "layout": "string - ASCII wireframe showing the page layout with regions labeled",
+      "components": [{"name":"string","type":"string - e.g. Sidebar, Modal, Card, Form, List","description":"string"}]
+    }
+  ],
+  "developmentPhases": [{"phase":1,"name":"string","duration":"string","tasks":["string"],"deliverables":["string"]}],
+  "estimatedCost": {
+    "development": "string - total dev cost estimate",
+    "monthly": "string - monthly running cost",
+    "breakdown": [{"item":"string","cost":"string"}]
+  }
+}
+
+Be thorough:
+- Include 3-5+ items per array.
+- uiBlueprints: Include at least 4 key pages/screens. Each layout should be an ASCII wireframe showing where components go.
+- architecture.diagram: Must be a real ASCII diagram, not empty.`,
+                `You are a senior software architect and product analyst. You MUST analyze what technologies the product actually uses based on evidence (domain, branding, page content). For example: Google products use Gemini not OpenAI, Meta products use LLaMA, etc. Never guess generically. Return ONLY valid JSON with the exact camelCase keys. No markdown wrapping.`,
+                { jsonMode: true, maxOutputTokens: 16384 }
             );
 
             if (result) {
-                setBlueprint(result);
+                const normalized = normalizeResponse(result);
+                const safe: Blueprint = {
+                    productName: normalized.productName || 'Unknown Product',
+                    description: normalized.description || '',
+                    architecture: {
+                        type: normalized.architecture?.type || 'Unknown',
+                        description: normalized.architecture?.description || '',
+                        diagram: normalized.architecture?.diagram || '',
+                    },
+                    techStack: {
+                        frontend: normalized.techStack?.frontend || [],
+                        backend: normalized.techStack?.backend || [],
+                        database: normalized.techStack?.database || [],
+                        infrastructure: normalized.techStack?.infrastructure || [],
+                        thirdParty: normalized.techStack?.thirdParty || [],
+                    },
+                    coreFeatures: normalized.coreFeatures || [],
+                    dataModels: normalized.dataModels || [],
+                    apiEndpoints: normalized.apiEndpoints || [],
+                    uiBlueprints: normalized.uiBlueprints || [],
+                    developmentPhases: normalized.developmentPhases || [],
+                    estimatedCost: {
+                        development: normalized.estimatedCost?.development || 'N/A',
+                        monthly: normalized.estimatedCost?.monthly || 'N/A',
+                        breakdown: normalized.estimatedCost?.breakdown || [],
+                    },
+                };
+                setBlueprint(safe);
                 success('Blueprint generated');
             }
         } catch (err) {
@@ -216,17 +317,17 @@ Be specific about:
             md += `### ${idx + 1}. ${f.name}\n`;
             md += `${f.description}\n\n`;
             md += `**Implementation:** ${f.implementation}\n\n`;
-            md += `**APIs:** ${f.apis.join(', ')}\n\n`;
+            md += `**APIs:** ${(f.apis || []).join(', ')}\n\n`;
         });
 
         md += `## Data Models\n\n`;
         blueprint.dataModels.forEach(m => {
             md += `### ${m.name}\n`;
             md += `| Field | Type | Required |\n|-------|------|----------|\n`;
-            m.fields.forEach(f => {
+            (m.fields || []).forEach(f => {
                 md += `| ${f.name} | ${f.type} | ${f.required ? 'Yes' : 'No'} |\n`;
             });
-            md += `\n**Relationships:** ${m.relationships.join(', ')}\n\n`;
+            md += `\n**Relationships:** ${(m.relationships || []).join(', ')}\n\n`;
         });
 
         md += `## API Endpoints\n\n`;
@@ -234,6 +335,24 @@ Be specific about:
             md += `### \`${e.method} ${e.path}\`\n`;
             md += `${e.description}\n\n`;
         });
+
+        if (blueprint.uiBlueprints.length > 0) {
+            md += `## UI Blueprints\n\n`;
+            blueprint.uiBlueprints.forEach(page => {
+                md += `### ${page.name} (\`${page.route}\`)\n`;
+                md += `${page.description}\n\n`;
+                if (page.layout) {
+                    md += "```\n" + page.layout + "\n```\n\n";
+                }
+                if ((page.components || []).length > 0) {
+                    md += `**Components:**\n`;
+                    page.components.forEach(c => {
+                        md += `- **${c.name}** (${c.type}): ${c.description}\n`;
+                    });
+                    md += '\n';
+                }
+            });
+        }
 
         md += `## Development Phases\n\n`;
         blueprint.developmentPhases.forEach(p => {
@@ -408,7 +527,7 @@ Be specific about:
                                 <div key={idx} className="p-3 rounded bg-slate-900/50">
                                     <h4 className="text-sm font-medium text-slate-200 mb-2">{model.name}</h4>
                                     <div className="space-y-1">
-                                        {model.fields.slice(0, 5).map((field, fidx) => (
+                                        {(model.fields || []).slice(0, 5).map((field, fidx) => (
                                             <div key={fidx} className="flex items-center gap-2 text-xs">
                                                 <span className="text-blue-400 font-mono">{field.name}</span>
                                                 <span className="text-slate-600">:</span>
@@ -416,7 +535,7 @@ Be specific about:
                                                 {field.required && <span className="text-red-400">*</span>}
                                             </div>
                                         ))}
-                                        {model.fields.length > 5 && (
+                                        {(model.fields || []).length > 5 && (
                                             <span className="text-xs text-slate-500">+{model.fields.length - 5} more fields</span>
                                         )}
                                     </div>
@@ -444,6 +563,40 @@ Be specific about:
                             ))}
                         </div>
                     </Section>
+
+                    {/* UI Blueprints */}
+                    {blueprint.uiBlueprints.length > 0 && (
+                        <Section id="ui" title={`UI Blueprints (${blueprint.uiBlueprints.length})`} icon={<Monitor size={14} />}>
+                            <div className="space-y-4">
+                                {blueprint.uiBlueprints.map((page, idx) => (
+                                    <div key={idx} className="p-3 rounded bg-slate-900/50 space-y-2">
+                                        <div className="flex items-center justify-between">
+                                            <h4 className="text-sm font-medium text-slate-200">{page.name}</h4>
+                                            <span className="text-xs font-mono text-slate-500">{page.route}</span>
+                                        </div>
+                                        <p className="text-xs text-slate-400">{page.description}</p>
+                                        {page.layout && (
+                                            <pre className="text-xs text-cyan-400 bg-slate-950 p-3 rounded overflow-x-auto font-mono whitespace-pre">
+                                                {page.layout}
+                                            </pre>
+                                        )}
+                                        {(page.components || []).length > 0 && (
+                                            <div className="space-y-1 pt-1">
+                                                <span className="text-xs text-slate-500 uppercase">Components</span>
+                                                {page.components.map((comp, cidx) => (
+                                                    <div key={cidx} className="flex items-center gap-2 text-xs">
+                                                        <span className="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400 font-medium">{comp.type}</span>
+                                                        <span className="text-slate-200">{comp.name}</span>
+                                                        <span className="text-slate-500">- {comp.description}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </Section>
+                    )}
 
                     {/* Development Phases */}
                     <Section id="phases" title="Development Phases" icon={<GitBranch size={14} />}>

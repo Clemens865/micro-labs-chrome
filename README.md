@@ -1,10 +1,10 @@
 # MicroLabs Chrome Extension
 
-> **Alpha Release** - AI-powered productivity suite with 55+ micro-apps for research, content analysis, development, and workflow automation using Google Gemini AI.
+> **Alpha Release** - AI-powered productivity suite with 63 micro-apps for research, content analysis, development, and workflow automation using Google Gemini AI.
 
 ## Features
 
-- 55+ specialized AI micro-apps
+- 63 specialized AI micro-apps
 - Powered by Google Gemini 2.0 Flash & Gemini 2.5 Flash Image
 - Chrome Side Panel interface
 - Works on any webpage
@@ -28,18 +28,21 @@
 | App | Description |
 |-----|-------------|
 | **Research Assistant** | AI research with live Google Search grounding |
+| **Deep Research** | AI rabbit hole - explore topics infinitely deep |
 | **Fact Checker** | AI fact-checking with source verification |
 | **Citation Generator** | APA, MLA, Chicago & Harvard citations |
 | **Source Credibility** | Evaluate trustworthiness & reliability |
 | **Neighborhood Intel AI** | Real-time neighborhood research & analysis |
 | **Privacy Policy Diff Tracker** | Track privacy policy changes with AI risk analysis |
+| **Docs Crawler** | AI-powered documentation crawler that extracts & organizes content from entire doc sites |
+| **Multi-Site Comparator** | Compare up to 20 URLs simultaneously for products, pricing, features & reviews |
 
 ### AI Agents
 
 | App | Description |
 |-----|-------------|
+| **Advanced Chat** | Research chat with live web search, page context analysis & export |
 | **Web Research Agent** | Multi-URL analysis & synthesis with agentic browsing |
-| **Deep Research** | AI rabbit hole - explore topics infinitely deep |
 | **Competitive Analysis** | AI-powered competitor research & insights |
 | **Link Analyzer** | Deep-dive analysis of linked pages |
 | **Topic Monitor** | Track topics across resources & stay updated |
@@ -65,8 +68,8 @@
 | **Page Reader** | Listen to any page with text-to-speech |
 | **AI Image Generator** | Create images with Google Imagen 3 |
 | **SVG Icon Generator** | AI-powered icon & logo creation with 65 styles, batch mode & vector export |
-| **Image Editor** | Crop, rotate, filter, draw & annotate images |
 | **Pixel Alchemy** | AI image editing with text prompts and reference mixing |
+| **Brand Studio** | AI-powered design studio for branded marketing assets with layers, shapes & AI generation |
 
 ### Developer Tools
 
@@ -96,6 +99,15 @@
 | **Interview Question Generator** | Role-specific questions with sample answers |
 | **Smart Clipboard Manager** | Intelligent clipboard history with AI categorization |
 
+### Data & Analytics
+
+| App | Description |
+|-----|-------------|
+| **PDF Analyzer** | Analyze PDFs with AI - summaries, key points, tables & document chat |
+| **Data Visualizer** | Convert CSV, JSON, tables or screenshots into interactive charts with AI analysis |
+| **Statistical Analyzer** | Statistical analysis on datasets with descriptive stats, correlations & regression |
+| **Audio Transcriber** | Transcribe & analyze audio files with AI summaries, action items & key points |
+
 ### Business
 
 | App | Description |
@@ -118,42 +130,38 @@
 
 - **Node.js** (v18 or higher) - [Download](https://nodejs.org/)
 - **npm** (comes with Node.js)
+- **Google Chrome** browser
 - **Google AI API Key** - [Get one free](https://aistudio.google.com/apikey)
 
-### Step 1: Clone the Repository
+### Quick Start
 
 ```bash
+# 1. Clone the repository
 git clone https://github.com/Clemens865/micro-labs-chrome.git
 cd micro-labs-chrome
-```
 
-### Step 2: Install Dependencies
-
-```bash
+# 2. Install dependencies
 npm install
-```
 
-### Step 3: Build the Extension
-
-```bash
+# 3. Build the extension
 npm run build
 ```
 
-This creates a `dist/` folder with the compiled extension.
+### Load in Chrome
 
-### Step 4: Load in Chrome
-
-1. Open Chrome and go to `chrome://extensions/`
+1. Open Chrome and navigate to `chrome://extensions/`
 2. Enable **"Developer mode"** (toggle in top right corner)
 3. Click **"Load unpacked"**
-4. Select the `dist/` folder inside your project directory
+4. Select the `dist/` folder inside the project directory
 
-### Step 5: Configure API Key
+### Configure API Key
 
 1. Click the MicroLabs icon in Chrome toolbar (or right-click and select "Open side panel")
 2. Go to **Settings** (gear icon)
-3. Enter your Google AI API Key
-4. Click Save
+3. Enter your **Google AI API Key** ([get one here](https://aistudio.google.com/apikey))
+4. Click **Save**
+
+You're all set! Open the side panel on any webpage to start using the apps.
 
 ---
 
@@ -184,11 +192,11 @@ This rebuilds automatically when you make changes. After changes:
 ```
 micro-labs-chrome/
 ├── src/
-│   ├── apps/              # Individual micro-apps (55+)
+│   ├── apps/              # Individual micro-apps (63)
 │   │   ├── page-digest/
 │   │   ├── youtube-digest/
-│   │   ├── svg-icon-generator/
-│   │   ├── pixel-alchemy/
+│   │   ├── advanced-chat/
+│   │   ├── pdf-analyzer/
 │   │   └── ...
 │   ├── hooks/             # React hooks (useGemini, usePageContext, etc.)
 │   ├── components/        # Shared components
@@ -207,7 +215,7 @@ micro-labs-chrome/
 
 - **React 19** - UI Framework
 - **TypeScript** - Type Safety
-- **Vite** - Build Tool
+- **Vite 7** - Build Tool
 - **Google Gemini AI** - AI Backend
   - Gemini 2.0 Flash (text generation, analysis)
   - Gemini 2.5 Flash Image (image generation)
@@ -231,7 +239,7 @@ npm run build
 
 ### API Key errors
 - Verify your API key at [Google AI Studio](https://aistudio.google.com/)
-- Make sure you have billing enabled (free tier available)
+- Make sure the Gemini API is enabled for your key
 
 ### Changes not appearing
 - Refresh the extension at `chrome://extensions/`

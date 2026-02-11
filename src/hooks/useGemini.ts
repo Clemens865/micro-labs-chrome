@@ -18,6 +18,7 @@ interface GenerateOptions {
     // New SDK features
     tools?: Array<{ googleSearch?: object; googleMaps?: object; urlContext?: object }>;
     thinkingBudget?: number;
+    maxOutputTokens?: number;
 }
 
 interface SearchGroundingResult {
@@ -26,6 +27,16 @@ interface SearchGroundingResult {
         uri: string;
         title?: string;
     }>;
+    searchQueries?: string[];
+}
+
+interface ChatMessage {
+    role: 'user' | 'model';
+    content: string;
+}
+
+interface ChatWithSearchResult extends SearchGroundingResult {
+    suggestedFollowups?: string[];
 }
 
 export const useGemini = () => {
@@ -75,7 +86,7 @@ export const useGemini = () => {
                 temperature: 0.7,
                 topK: 40,
                 topP: 0.95,
-                maxOutputTokens: 4096,
+                maxOutputTokens: options.maxOutputTokens || 4096,
             };
 
             // JSON mode
@@ -195,7 +206,7 @@ export const useGemini = () => {
         }
     }, []);
 
-    // New method: Generate images (requires Gemini 2.0 Flash or Imagen)
+    // New method: Generate images using Imagen 3
     const generateImage = useCallback(async (
         prompt: string,
         options: {
@@ -217,32 +228,31 @@ export const useGemini = () => {
 
             const ai = new GoogleGenAI({ apiKey });
 
-            // Use Gemini 2.5 Flash Image model for image generation (Nano Banana)
-            // See: https://ai.google.dev/gemini-api/docs/image-generation
-            const response = await ai.models.generateContent({
-                model: 'gemini-2.5-flash-image',
-                contents: {
-                    parts: [{ text: prompt }]
-                },
+            // Use Imagen 3 for high-quality image generation
+            // See: https://ai.google.dev/gemini-api/docs/imagen
+            const response = await ai.models.generateImages({
+                model: 'imagen-3.0-generate-002',
+                prompt: prompt,
                 config: {
-                    responseModalities: ['image', 'text'],
+                    numberOfImages: options.numberOfImages || 1,
+                    aspectRatio: options.aspectRatio || '1:1',
+                    outputMimeType: 'image/png',
                 }
             });
 
-            // Extract base64 images from response
+            // Extract base64 images from response - return RAW base64 (no data URL prefix)
             const images: string[] = [];
-            if (response.candidates?.[0]?.content?.parts) {
-                for (const part of response.candidates[0].content.parts) {
-                    if (part.inlineData?.data) {
-                        // Return with data URL prefix for easier use
-                        const mimeType = part.inlineData.mimeType || 'image/png';
-                        images.push(`data:${mimeType};base64,${part.inlineData.data}`);
+            if (response.generatedImages) {
+                for (const img of response.generatedImages) {
+                    if (img.image?.imageBytes) {
+                        // Return raw base64 data (component adds the data URL prefix)
+                        images.push(img.image.imageBytes);
                     }
                 }
             }
 
             if (images.length === 0) {
-                throw new Error('No images were generated. The model may not support image generation for this prompt.');
+                throw new Error('No images were generated. Try a different prompt or check your API quota.');
             }
 
             return images;
@@ -345,11 +355,118 @@ ${prompt}`;
         }
     }, []);
 
+    // New method: Chat with optional search grounding for conversational research
+    const chatWithSearch = useCallback(async (
+        message: string,
+        conversationHistory: ChatMessage[],
+        options: {
+            systemInstruction?: string;
+            enableSearch?: boolean;
+            pageContext?: {
+                title?: string;
+                url?: string;
+                content?: string;
+            };
+        } = {}
+    ): Promise<ChatWithSearchResult> => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const { apiKey } = await new Promise<{ apiKey: string }>((resolve) => {
+                chrome.runtime.sendMessage({ type: 'GET_API_KEY' }, resolve);
+            });
+
+            if (!apiKey) {
+                throw new Error('API Key not found. Please set it in settings.');
+            }
+
+            const ai = new GoogleGenAI({ apiKey });
+
+            // Build config with optional search grounding
+            const config: any = {
+                temperature: 0.7,
+                topK: 40,
+                topP: 0.95,
+                maxOutputTokens: 8192,
+            };
+
+            if (options.enableSearch) {
+                config.tools = [{ googleSearch: {} }];
+            }
+
+            if (options.systemInstruction) {
+                config.systemInstruction = options.systemInstruction;
+            }
+
+            // Build conversation contents for multi-turn chat
+            const contents: any[] = conversationHistory.map(msg => ({
+                role: msg.role,
+                parts: [{ text: msg.content }]
+            }));
+
+            // Add the new user message
+            contents.push({
+                role: 'user',
+                parts: [{ text: message }]
+            });
+
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.0-flash',
+                contents,
+                config
+            });
+
+            const text = response.text || '';
+
+            // Extract grounding sources and search queries
+            const sources: Array<{ uri: string; title?: string }> = [];
+            const searchQueries: string[] = [];
+
+            const candidate = response.candidates?.[0];
+            if (candidate) {
+                const groundingMetadata = (candidate as any).groundingMetadata;
+                if (groundingMetadata) {
+                    // Extract grounding chunks (sources)
+                    if (groundingMetadata.groundingChunks) {
+                        for (const chunk of groundingMetadata.groundingChunks) {
+                            if (chunk.web?.uri) {
+                                // Dedupe sources
+                                if (!sources.find(s => s.uri === chunk.web.uri)) {
+                                    sources.push({
+                                        uri: chunk.web.uri,
+                                        title: chunk.web.title
+                                    });
+                                }
+                            }
+                        }
+                    }
+                    // Extract search queries used
+                    if (groundingMetadata.webSearchQueries) {
+                        searchQueries.push(...groundingMetadata.webSearchQueries);
+                    }
+                }
+            }
+
+            return {
+                text,
+                sources,
+                searchQueries: searchQueries.length > 0 ? searchQueries : undefined
+            };
+        } catch (err: any) {
+            setError(err.message);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     return {
         generateContent,
         generateWithSearch,
         generateImage,
         analyzeUrls,
+        chatWithSearch,
         loading,
         error
     };

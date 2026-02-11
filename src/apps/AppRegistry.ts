@@ -40,6 +40,13 @@ export const appRegistry: AppMetadata[] = [
         category: 'Page Analysis'
     },
     {
+        id: 'advanced-chat',
+        title: 'Advanced Chat',
+        description: 'Research chat with live web search.',
+        icon: 'Sparkles',
+        category: 'Page Analysis'
+    },
+    {
         id: 'screenshot-analyzer',
         title: 'Screenshot Analyzer',
         description: 'AI-powered visual analysis of any page.',
@@ -51,6 +58,13 @@ export const appRegistry: AppMetadata[] = [
         title: 'Terms & Privacy Analyzer',
         description: 'Analyze any page for legal risks & privacy concerns.',
         icon: 'Scale',
+        category: 'Page Analysis'
+    },
+    {
+        id: 'pdf-analyzer',
+        title: 'PDF Deep Analyzer',
+        description: 'Analyze, extract & chat with PDF documents.',
+        icon: 'FileText',
         category: 'Page Analysis'
     },
     // === RESEARCH ===
@@ -130,6 +144,20 @@ export const appRegistry: AppMetadata[] = [
         title: 'Auto Browser Agent',
         description: 'Automated web browsing with content extraction.',
         icon: 'Globe',
+        category: 'AI Agents'
+    },
+    {
+        id: 'docs-crawler',
+        title: 'Docs Crawler',
+        description: 'Crawl entire documentation sites into one file.',
+        icon: 'FolderTree',
+        category: 'AI Agents'
+    },
+    {
+        id: 'multi-site-comparator',
+        title: 'Multi-Site Comparator',
+        description: 'Compare up to 20 URLs simultaneously with AI.',
+        icon: 'Scale',
         category: 'AI Agents'
     },
     // === BROWSER TOOLS ===
@@ -369,6 +397,20 @@ export const appRegistry: AppMetadata[] = [
         category: 'Developer'
     },
     {
+        id: 'data-visualizer',
+        title: 'Data Visualizer',
+        description: 'Turn any data into charts & insights with AI.',
+        icon: 'BarChart3',
+        category: 'Developer'
+    },
+    {
+        id: 'statistical-analyzer',
+        title: 'Statistical Analyzer',
+        description: 'AI-powered statistical analysis with Python code.',
+        icon: 'Calculator',
+        category: 'Developer'
+    },
+    {
         id: 'job-application-assistant',
         title: 'Job Application Assistant',
         description: 'Generate personalized cover letters & interview prep from job postings.',
@@ -411,10 +453,10 @@ export const appRegistry: AppMetadata[] = [
         category: 'Productivity'
     },
     {
-        id: 'image-editor',
-        title: 'Image Editor',
-        description: 'Crop, rotate, filter, draw & annotate images with Canvas-based editor.',
-        icon: 'Image',
+        id: 'audio-transcriber',
+        title: 'Audio Transcriber',
+        description: 'Transcribe & analyze audio with AI summaries.',
+        icon: 'Mic',
         category: 'Media'
     },
     {
@@ -465,6 +507,7 @@ export const appRegistry: AppMetadata[] = [
 const appComponents: Record<string, React.LazyExoticComponent<any>> = {
     'digest': lazy(() => import('./page-digest/page')),
     'chat': lazy(() => import('./chat-with-page/page')),
+    'advanced-chat': lazy(() => import('./advanced-chat/page')),
     'youtube': lazy(() => import('./youtube-digest/page')),
     'email': lazy(() => import('./email-composer/page')),
     'neighborhood-intel': lazy(() => import('./neighborhood-intel/page')),
@@ -495,6 +538,8 @@ const appComponents: Record<string, React.LazyExoticComponent<any>> = {
     // Browser Automation & Tab Management
     'tab-manager': lazy(() => import('./tab-manager/page')),
     'auto-browser': lazy(() => import('./auto-browser/page')),
+    'docs-crawler': lazy(() => import('./docs-crawler/page')),
+    'multi-site-comparator': lazy(() => import('./multi-site-comparator/page')),
     'tab-automations': lazy(() => import('./tab-automations/page')),
     'reading-queue': lazy(() => import('./reading-queue/page')),
     'multi-tab-scraper': lazy(() => import('./multi-tab-scraper/page')),
@@ -518,7 +563,10 @@ const appComponents: Record<string, React.LazyExoticComponent<any>> = {
     'contract-clause-extractor': lazy(() => import('./contract-clause-extractor/page')),
     'data-table-extractor': lazy(() => import('./data-table-extractor/page')),
     'smart-clipboard-manager': lazy(() => import('./smart-clipboard-manager/page')),
-    'image-editor': lazy(() => import('./image-editor/page')),
+    'audio-transcriber': lazy(() => import('./audio-transcriber/page')),
+    'data-visualizer': lazy(() => import('./data-visualizer/page')),
+    'pdf-analyzer': lazy(() => import('./pdf-analyzer/page')),
+    'statistical-analyzer': lazy(() => import('./statistical-analyzer/page')),
     'pixel-alchemy': lazy(() => import('./pixel-alchemy/page')),
 };
 

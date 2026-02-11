@@ -782,8 +782,16 @@ MANDATORY RULES:
                 )}
             </div>
 
-            {/* Image Preview Area */}
-            <div className="flex-1 relative rounded-lg overflow-hidden" style={{ background: 'hsl(222 47% 7%)', minHeight: '200px' }}>
+            {/* Image Preview Area - constrained height */}
+            <div
+                className="relative rounded-lg overflow-hidden flex items-center justify-center"
+                style={{
+                    background: 'hsl(222 47% 7%)',
+                    minHeight: '180px',
+                    maxHeight: '280px',
+                    height: '40vh'
+                }}
+            >
                 {isProcessing && (
                     <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-slate-950/80 backdrop-blur-sm">
                         <Wand2 className="w-10 h-10 text-violet-400 animate-bounce" />
@@ -793,15 +801,15 @@ MANDATORY RULES:
                 )}
 
                 {showComparison && prevImage ? (
-                    <div className="relative w-full h-full">
-                        <img src={currentImage} className="w-full h-full object-contain" alt="Current" />
+                    <div className="relative w-full h-full flex items-center justify-center">
+                        <img src={currentImage} className="max-w-full max-h-full object-contain" alt="Current" />
                         <div
-                            className="absolute inset-0 overflow-hidden"
+                            className="absolute inset-0 overflow-hidden flex items-center justify-center"
                             style={{ width: `${compareValue}%`, borderRight: '2px solid white' }}
                         >
                             <img
                                 src={prevImage}
-                                className="absolute top-0 left-0 h-full object-contain"
+                                className="max-w-full max-h-full object-contain"
                                 alt="Previous"
                             />
                         </div>
@@ -815,20 +823,32 @@ MANDATORY RULES:
                         />
                     </div>
                 ) : (
-                    <div className="relative w-full h-full flex items-center justify-center p-4">
+                    <div className="relative w-full h-full flex items-center justify-center p-2">
                         <img
                             ref={imgRef}
                             src={currentImage}
-                            className="max-w-full max-h-full object-contain rounded-lg"
+                            className="rounded-lg shadow-lg"
+                            style={{
+                                maxWidth: '100%',
+                                maxHeight: '100%',
+                                objectFit: 'contain',
+                                width: 'auto',
+                                height: 'auto'
+                            }}
                             alt="Current"
                         />
 
                         {/* Marker canvas */}
-                        {activeTool === 'mark' && (
+                        {activeTool === 'mark' && imgRef.current && (
                             <canvas
                                 ref={markerCanvasRef}
-                                className="absolute inset-0 cursor-crosshair"
-                                style={{ top: imgRef.current?.offsetTop, left: imgRef.current?.offsetLeft, width: imgRef.current?.clientWidth, height: imgRef.current?.clientHeight }}
+                                className="absolute cursor-crosshair pointer-events-auto"
+                                style={{
+                                    top: imgRef.current.offsetTop,
+                                    left: imgRef.current.offsetLeft,
+                                    width: imgRef.current.clientWidth,
+                                    height: imgRef.current.clientHeight
+                                }}
                                 onMouseDown={startDrawing}
                                 onMouseMove={draw}
                                 onMouseUp={stopDrawing}
@@ -837,11 +857,16 @@ MANDATORY RULES:
                         )}
 
                         {/* Crop overlay */}
-                        {activeTool === 'crop' && (
+                        {activeTool === 'crop' && imgRef.current && (
                             <canvas
                                 ref={cropOverlayRef}
-                                className="absolute cursor-move"
-                                style={{ top: imgRef.current?.offsetTop, left: imgRef.current?.offsetLeft, width: imgRef.current?.clientWidth, height: imgRef.current?.clientHeight }}
+                                className="absolute cursor-move pointer-events-auto"
+                                style={{
+                                    top: imgRef.current.offsetTop,
+                                    left: imgRef.current.offsetLeft,
+                                    width: imgRef.current.clientWidth,
+                                    height: imgRef.current.clientHeight
+                                }}
                                 onMouseDown={handleCropMouseDown}
                                 onMouseMove={handleCropMouseMove}
                                 onMouseUp={handleCropMouseUp}
