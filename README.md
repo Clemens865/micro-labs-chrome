@@ -1,10 +1,10 @@
 # MicroLabs Chrome Extension
 
-> **Alpha Release** - AI-powered productivity suite with 63 micro-apps for research, content analysis, development, and workflow automation using Google Gemini AI.
+> **Alpha Release** - AI-powered productivity suite with 100 micro-apps for research, content analysis, development, and workflow automation using Google Gemini AI.
 
 ## Features
 
-- 63 specialized AI micro-apps
+- 100 specialized AI micro-apps
 - Powered by Google Gemini 2.0 Flash & Gemini 2.5 Flash Image
 - Chrome Side Panel interface
 - Works on any webpage
@@ -20,8 +20,10 @@
 |-----|-------------|
 | **Page Digest** | Instant summaries and key points extraction |
 | **Chat with Page** | Interactive Q&A with any webpage content |
+| **Advanced Chat** | Research chat with live web search, page context analysis & export |
 | **Screenshot Analyzer** | AI-powered visual analysis of any page |
 | **Terms & Privacy Analyzer** | Analyze pages for legal risks & privacy concerns |
+| **PDF Deep Analyzer** | Analyze, extract & chat with PDF documents |
 
 ### Research
 
@@ -36,12 +38,13 @@
 | **Privacy Policy Diff Tracker** | Track privacy policy changes with AI risk analysis |
 | **Docs Crawler** | AI-powered documentation crawler that extracts & organizes content from entire doc sites |
 | **Multi-Site Comparator** | Compare up to 20 URLs simultaneously for products, pricing, features & reviews |
+| **Academic Insight** | Source check & citation help with bias detection |
+| **Fact Check Pro** | Spot logical fallacies & bias in any text |
 
 ### AI Agents
 
 | App | Description |
 |-----|-------------|
-| **Advanced Chat** | Research chat with live web search, page context analysis & export |
 | **Web Research Agent** | Multi-URL analysis & synthesis with agentic browsing |
 | **Competitive Analysis** | AI-powered competitor research & insights |
 | **Link Analyzer** | Deep-dive analysis of linked pages |
@@ -70,6 +73,8 @@
 | **SVG Icon Generator** | AI-powered icon & logo creation with 65 styles, batch mode & vector export |
 | **Pixel Alchemy** | AI image editing with text prompts and reference mixing |
 | **Brand Studio** | AI-powered design studio for branded marketing assets with layers, shapes & AI generation |
+| **Audio Transcriber** | Transcribe & analyze audio files with AI summaries, action items & key points |
+| **Color Extract** | Generate color palettes from any text or page content |
 
 ### Developer Tools
 
@@ -86,6 +91,20 @@
 | **Error Log Parser** | AI-powered error analysis with root cause & fixes |
 | **Feature Flag Detector** | Detect hidden feature flags from localStorage, cookies |
 | **Performance Budget Enforcer** | Track & enforce page performance budgets |
+| **Performance Pro** | Code review & optimization analysis |
+| **Code Morph** | Translate code between programming languages |
+| **Regex Wizard** | Generate regex patterns from plain English descriptions |
+| **Bug Report Writer** | Create detailed, developer-friendly bug reports |
+| **Schema Markup** | Generate SEO JSON-LD structured data markup |
+
+### Data & Analytics
+
+| App | Description |
+|-----|-------------|
+| **Data Visualizer** | Convert CSV, JSON, tables or screenshots into interactive charts with AI analysis |
+| **Statistical Analyzer** | Statistical analysis on datasets with descriptive stats, correlations & regression |
+| **Sentiment Pulse** | Analyze emotional tone & sentiment in any text |
+| **Reading Time Analyzer** | Analyze readability, complexity & reading time |
 
 ### Productivity
 
@@ -98,15 +117,18 @@
 | **Job Application Assistant** | Generate cover letters & interview prep |
 | **Interview Question Generator** | Role-specific questions with sample answers |
 | **Smart Clipboard Manager** | Intelligent clipboard history with AI categorization |
-
-### Data & Analytics
-
-| App | Description |
-|-----|-------------|
-| **PDF Analyzer** | Analyze PDFs with AI - summaries, key points, tables & document chat |
-| **Data Visualizer** | Convert CSV, JSON, tables or screenshots into interactive charts with AI analysis |
-| **Statistical Analyzer** | Statistical analysis on datasets with descriptive stats, correlations & regression |
-| **Audio Transcriber** | Transcribe & analyze audio files with AI summaries, action items & key points |
+| **TL;DR Summary** | Instant concise summaries at any length |
+| **Bullet Pointer** | Convert dense text into clean bullet points |
+| **Tone Rewriter** | Rewrite text in different tones & styles |
+| **Translator Pro** | Smart contextual translation across 8 languages |
+| **Content Refresher** | Update outdated content for the current year |
+| **Glossary Generator** | Extract & define key terms from any text |
+| **Reply Suggester** | Generate smart email replies at 3 depth levels |
+| **Jargon Decoder** | Translate corporate-speak to plain English |
+| **Quick Decision Matrix** | AI-powered weighted pros/cons analysis |
+| **Graceful Excuse Generator** | Professional, polite excuses for any situation |
+| **SOP Genius** | Transform any process into a professional SOP |
+| **Skill Card Builder** | Create professional skill profile cards |
 
 ### Business
 
@@ -121,6 +143,32 @@
 | **Competitor Ad Spy** | Capture & analyze competitor ads |
 | **Social Proof Harvester** | Extract testimonials, reviews & social proof |
 | **Contract Clause Extractor** | Extract & analyze contract clauses with risk assessment |
+| **Cold Outreach** | Generate hyper-personalized cold emails & DMs |
+| **Job Market Pulse** | Analyze job descriptions & required skills |
+| **Cold Email Analyzer** | Analyze emails for warmth & spam triggers |
+| **NDA Creator** | Generate professional NDAs in seconds |
+| **Pitch Deck Pro** | Generate VC-ready pitch deck outlines |
+| **Win-Win Deal Designer** | Design creative partnership & deal structures |
+
+### Marketing & Content
+
+| App | Description |
+|-----|-------------|
+| **SEO Architect** | Analyze page SEO, keywords & optimization opportunities |
+| **LexGuard** | Simplify legal jargon & terms of service |
+| **Social Viral** | Create viral posts for Twitter, LinkedIn & Instagram |
+| **Headline Generator** | Create viral headlines & titles for any platform |
+| **CTA Generator** | Create compelling calls-to-action that convert |
+
+### Fun & Learning
+
+| App | Description |
+|-----|-------------|
+| **Explain Like I'm 5** | Simplify complex topics with simple analogies |
+| **Idea Spark** | Brainstorm startup ideas from page content |
+| **Ask The Expert** | Consult a specific expert persona (lawyer, doctor, etc.) |
+| **Travel Scout** | Plan trips from locations mentioned in page content |
+| **Recipe Remix** | Extract & modify recipes for dietary needs |
 
 ---
 
@@ -192,7 +240,7 @@ This rebuilds automatically when you make changes. After changes:
 ```
 micro-labs-chrome/
 ├── src/
-│   ├── apps/              # Individual micro-apps (63)
+│   ├── apps/              # Individual micro-apps (100)
 │   │   ├── page-digest/
 │   │   ├── youtube-digest/
 │   │   ├── advanced-chat/
