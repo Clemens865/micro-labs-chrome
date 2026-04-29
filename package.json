@@ -1,6 +1,6 @@
 {
   "name": "microlabs-chrome",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "AI-powered meeting assistant with real-time transcription, translation, and intelligent summaries using Google Gemini's Live API.",
   "main": "background.js",
   "directories": {

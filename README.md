@@ -5,10 +5,23 @@
 ## Features
 
 - 100 specialized AI micro-apps
-- Powered by Google Gemini 2.0 Flash & Gemini 2.5 Flash Image
+- Powered by Google Gemini 3 Flash (text) & Gemini 2.5 Flash Image (visuals)
 - Chrome Side Panel interface
 - Works on any webpage
 - Local storage for privacy
+
+---
+
+## Quick Install (no build required)
+
+1. Download the latest `microlabs-chrome-vX.Y.Z.zip` from the [Releases page](https://github.com/Clemens865/micro-labs-chrome/releases/latest).
+2. Unzip the file anywhere on your computer.
+3. Open Chrome and go to `chrome://extensions/`.
+4. Enable **"Developer mode"** (top-right toggle).
+5. Click **"Load unpacked"** and select the unzipped folder.
+6. Click the MicroLabs icon in the toolbar → Settings (gear icon) → enter your [Google AI API key](https://aistudio.google.com/apikey) → Save.
+
+No build tools or terminal required.
 
 ---
 
@@ -172,44 +185,25 @@
 
 ---
 
-## Installation
+## Build from Source
+
+> Most users should use the [Quick Install](#quick-install-no-build-required) above. Only build from source if you want to modify the code or contribute.
 
 ### Prerequisites
 
-- **Node.js** (v18 or higher) - [Download](https://nodejs.org/)
-- **npm** (comes with Node.js)
-- **Google Chrome** browser
-- **Google AI API Key** - [Get one free](https://aistudio.google.com/apikey)
+- Node.js v18 or higher
+- npm (bundled with Node.js)
 
-### Quick Start
+### Steps
 
 ```bash
-# 1. Clone the repository
 git clone https://github.com/Clemens865/micro-labs-chrome.git
 cd micro-labs-chrome
-
-# 2. Install dependencies
 npm install
-
-# 3. Build the extension
 npm run build
 ```
 
-### Load in Chrome
-
-1. Open Chrome and navigate to `chrome://extensions/`
-2. Enable **"Developer mode"** (toggle in top right corner)
-3. Click **"Load unpacked"**
-4. Select the `dist/` folder inside the project directory
-
-### Configure API Key
-
-1. Click the MicroLabs icon in Chrome toolbar (or right-click and select "Open side panel")
-2. Go to **Settings** (gear icon)
-3. Enter your **Google AI API Key** ([get one here](https://aistudio.google.com/apikey))
-4. Click **Save**
-
-You're all set! Open the side panel on any webpage to start using the apps.
+Then load the resulting `dist/` folder in `chrome://extensions/` (Developer mode → Load unpacked) and add your [Google AI API key](https://aistudio.google.com/apikey) in Settings.
 
 ---
 
@@ -265,8 +259,9 @@ micro-labs-chrome/
 - **TypeScript** - Type Safety
 - **Vite 7** - Build Tool
 - **Google Gemini AI** - AI Backend
-  - Gemini 2.0 Flash (text generation, analysis)
+  - Gemini 3 Flash Preview (text generation, analysis)
   - Gemini 2.5 Flash Image (image generation)
+  - Imagen 4 (high-quality image generation)
 - **ImageTracer.js** - SVG vectorization
 - **Chrome Extension APIs** - Side Panel, Storage, Tabs, Scripting
 

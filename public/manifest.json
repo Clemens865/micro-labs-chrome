@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "MicroLabs AI Tools",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "169+ AI-powered micro-tools for browsing: summarize, analyze, and automate - all context-aware",
   "permissions": [
     "sidePanel",
