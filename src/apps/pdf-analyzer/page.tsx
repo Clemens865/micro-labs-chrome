@@ -141,7 +141,7 @@ If no tables are found, extract any structured/numerical data present in the doc
                 prompts[analysisMode as Exclude<AnalysisMode, 'qa'>],
                 'You are an expert document analyst. Analyze PDFs thoroughly and extract information accurately. Preserve data precision for tables and numbers.',
                 {
-                    model: 'gemini-2.5-flash',
+                    model: 'gemini-3-flash-preview',
                     imageData: pdfBase64,
                     imageMimeType: 'application/pdf'
                 }
@@ -205,7 +205,7 @@ Provide a clear, accurate answer based on the document content. If the informati
                 prompt,
                 'You are a helpful assistant answering questions about a PDF document. Be accurate and cite specific parts of the document when possible.',
                 {
-                    model: 'gemini-2.5-flash',
+                    model: 'gemini-3-flash-preview',
                     imageData: pdfBase64,
                     imageMimeType: 'application/pdf'
                 }

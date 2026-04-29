@@ -148,7 +148,7 @@ Always include:
 - Proper statistical terminology
 - Practical interpretations
 - Complete, runnable Python code`,
-                { model: 'gemini-2.5-flash' }
+                { model: 'gemini-3-flash-preview' }
             );
 
             const text = typeof response === 'string' ? response : JSON.stringify(response);

@@ -64,7 +64,7 @@ export const useGemini = () => {
             const ai = new GoogleGenAI({ apiKey });
 
             // Build the model name - use latest models
-            const modelName = options.model || 'gemini-2.5-flash';
+            const modelName = options.model || 'gemini-3-flash-preview';
 
             // Build contents - can be string or array of parts
             let contents: string | Part[] = prompt;
@@ -171,7 +171,7 @@ export const useGemini = () => {
             }
 
             const response = await ai.models.generateContent({
-                model: 'gemini-2.5-flash',
+                model: 'gemini-3-flash-preview',
                 contents: prompt,
                 config
             });
@@ -315,7 +315,7 @@ ${urlList}
 ${prompt}`;
 
             const response = await ai.models.generateContent({
-                model: 'gemini-2.5-flash',
+                model: 'gemini-3-flash-preview',
                 contents: fullPrompt,
                 config
             });
@@ -412,7 +412,7 @@ ${prompt}`;
             });
 
             const response = await ai.models.generateContent({
-                model: 'gemini-2.5-flash',
+                model: 'gemini-3-flash-preview',
                 contents,
                 config
             });
