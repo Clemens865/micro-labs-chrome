@@ -187,7 +187,7 @@ Return only the bullet points, be concise.`
             const result = await generateContent(
                 prompts[mode],
                 'You are a technical documentation specialist. Extract and format documentation content clearly and accurately. Preserve code examples exactly. Never add information not present in the source.',
-                { model: 'gemini-2.0-flash' }
+                { model: 'gemini-2.5-flash' }
             );
             return typeof result === 'string' ? result : JSON.stringify(result);
         } catch (err) {

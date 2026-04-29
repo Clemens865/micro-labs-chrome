@@ -143,7 +143,7 @@ Format each section clearly with headers.`
                 prompts[analysisMode],
                 'You are an expert transcriptionist and meeting analyst. Provide accurate transcriptions and insightful analysis.',
                 {
-                    model: 'gemini-2.0-flash',
+                    model: 'gemini-2.5-flash',
                     imageData: audioBase64, // Gemini accepts audio as inline data too
                     imageMimeType: audioFile.type
                 }

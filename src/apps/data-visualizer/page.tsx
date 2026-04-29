@@ -121,7 +121,7 @@ Format the Python code in a code block. Make the code complete and runnable.`;
                 prompt,
                 'You are a data visualization expert. Analyze data and provide clear insights with Python visualization code using matplotlib and seaborn.',
                 {
-                    model: 'gemini-2.0-flash',
+                    model: 'gemini-2.5-flash',
                     imageData,
                     imageMimeType: 'image/png'
                 }

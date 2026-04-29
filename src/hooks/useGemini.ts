@@ -64,7 +64,7 @@ export const useGemini = () => {
             const ai = new GoogleGenAI({ apiKey });
 
             // Build the model name - use latest models
-            const modelName = options.model || 'gemini-2.0-flash';
+            const modelName = options.model || 'gemini-2.5-flash';
 
             // Build contents - can be string or array of parts
             let contents: string | Part[] = prompt;
@@ -171,7 +171,7 @@ export const useGemini = () => {
             }
 
             const response = await ai.models.generateContent({
-                model: 'gemini-2.0-flash',
+                model: 'gemini-2.5-flash',
                 contents: prompt,
                 config
             });
@@ -228,10 +228,10 @@ export const useGemini = () => {
 
             const ai = new GoogleGenAI({ apiKey });
 
-            // Use Imagen 3 for high-quality image generation
+            // Use Imagen 4 for high-quality image generation
             // See: https://ai.google.dev/gemini-api/docs/imagen
             const response = await ai.models.generateImages({
-                model: 'imagen-3.0-generate-002',
+                model: 'imagen-4.0-generate-001',
                 prompt: prompt,
                 config: {
                     numberOfImages: options.numberOfImages || 1,
@@ -315,7 +315,7 @@ ${urlList}
 ${prompt}`;
 
             const response = await ai.models.generateContent({
-                model: 'gemini-2.0-flash',
+                model: 'gemini-2.5-flash',
                 contents: fullPrompt,
                 config
             });
@@ -412,7 +412,7 @@ ${prompt}`;
             });
 
             const response = await ai.models.generateContent({
-                model: 'gemini-2.0-flash',
+                model: 'gemini-2.5-flash',
                 contents,
                 config
             });
