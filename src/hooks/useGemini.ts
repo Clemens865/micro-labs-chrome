@@ -17,7 +17,7 @@ interface GenerateOptions {
     imageMimeType?: string;
     // New SDK features
     tools?: Array<{ googleSearch?: object; googleMaps?: object; urlContext?: object }>;
-    thinkingBudget?: number;
+    thinkingLevel?: 'minimal' | 'low' | 'medium' | 'high';
     maxOutputTokens?: number;
 }
 
@@ -81,11 +81,9 @@ export const useGemini = () => {
                 ];
             }
 
-            // Build config
+            // Build config (Gemini 3: temperature 1.0, no topK/topP)
             const config: any = {
-                temperature: 0.7,
-                topK: 40,
-                topP: 0.95,
+                temperature: 1.0,
                 maxOutputTokens: options.maxOutputTokens || 4096,
             };
 
@@ -94,10 +92,10 @@ export const useGemini = () => {
                 config.responseMimeType = 'application/json';
             }
 
-            // Thinking/reasoning budget (for complex tasks)
-            if (options.thinkingBudget) {
+            // Thinking level for complex tasks (Gemini 3: minimal/low/medium/high)
+            if (options.thinkingLevel) {
                 config.thinkingConfig = {
-                    thinkingBudget: options.thinkingBudget
+                    thinkingLevel: options.thinkingLevel
                 };
             }
 
@@ -383,11 +381,9 @@ ${prompt}`;
 
             const ai = new GoogleGenAI({ apiKey });
 
-            // Build config with optional search grounding
+            // Build config with optional search grounding (Gemini 3 params)
             const config: any = {
-                temperature: 0.7,
-                topK: 40,
-                topP: 0.95,
+                temperature: 1.0,
                 maxOutputTokens: 8192,
             };
 
